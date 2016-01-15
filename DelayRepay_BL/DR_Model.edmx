@@ -1,0 +1,549 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="DR_Model.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityContainer Name="DR_ModelStoreContainer">
+          <EntitySet Name="Destinations" EntityType="DR_Model.Store.Destinations" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="EmailBatches" EntityType="DR_Model.Store.EmailBatches" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="FromStations" EntityType="DR_Model.Store.FromStations" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Journeys" EntityType="DR_Model.Store.Journeys" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Logs" EntityType="DR_Model.Store.Logs" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="LogTypes" EntityType="DR_Model.Store.LogTypes" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Stations" EntityType="DR_Model.Store.Stations" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="Users" EntityType="DR_Model.Store.Users" store:Type="Tables" Schema="dbo" />
+          <AssociationSet Name="FK_DestinationFromStation" Association="DR_Model.Store.FK_DestinationFromStation">
+            <End Role="Destinations" EntitySet="Destinations" />
+            <End Role="FromStations" EntitySet="FromStations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_EmailBatchDestination" Association="DR_Model.Store.FK_EmailBatchDestination">
+            <End Role="EmailBatches" EntitySet="EmailBatches" />
+            <End Role="Destinations" EntitySet="Destinations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_JourneyDestination" Association="DR_Model.Store.FK_JourneyDestination">
+            <End Role="Journeys" EntitySet="Journeys" />
+            <End Role="Destinations" EntitySet="Destinations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LogTypeLog" Association="DR_Model.Store.FK_LogTypeLog">
+            <End Role="LogTypes" EntitySet="LogTypes" />
+            <End Role="Logs" EntitySet="Logs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StationDestination" Association="DR_Model.Store.FK_StationDestination">
+            <End Role="Stations" EntitySet="Stations" />
+            <End Role="Destinations" EntitySet="Destinations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StationFromStation" Association="DR_Model.Store.FK_StationFromStation">
+            <End Role="Stations" EntitySet="Stations" />
+            <End Role="FromStations" EntitySet="FromStations" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StationUser" Association="DR_Model.Store.FK_StationUser">
+            <End Role="Stations" EntitySet="Stations" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserStation" Association="DR_Model.Store.FK_UserStation">
+            <End Role="Stations" EntitySet="Stations" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Destinations">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="JourneyId" Type="int" Nullable="false" />
+          <Property Name="StationId" Type="int" Nullable="false" />
+          <Property Name="ScheduledArrival" Type="datetime" Nullable="false" />
+          <Property Name="ActualArrival" Type="datetime" Nullable="false" />
+          <Property Name="EmailBatchId" Type="int" />
+        </EntityType>
+        <EntityType Name="EmailBatches">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Created" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="FromStations">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="DestinationId" Type="int" Nullable="false" />
+          <Property Name="StationId" Type="int" Nullable="false" />
+          <Property Name="ScheduledDeparture" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Journeys">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="JCode" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="TrainOperator" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Logs">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="LogTypeId" Type="int" Nullable="false" />
+          <Property Name="Timestamp" Type="datetime" Nullable="false" />
+          <Property Name="Message" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Header" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LogTypes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="LogTypeName" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Stations">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="StationCode" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="StationName" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="FormsAuthUserID" Type="int" Nullable="false" />
+          <Property Name="HomeStationId" Type="int" Nullable="false" />
+          <Property Name="DestinationStationId" Type="int" Nullable="false" />
+          <Property Name="EMail" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <Association Name="FK_DestinationFromStation">
+          <End Role="Destinations" Type="DR_Model.Store.Destinations" Multiplicity="1" />
+          <End Role="FromStations" Type="DR_Model.Store.FromStations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Destinations">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FromStations">
+              <PropertyRef Name="DestinationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_EmailBatchDestination">
+          <End Role="EmailBatches" Type="DR_Model.Store.EmailBatches" Multiplicity="0..1" />
+          <End Role="Destinations" Type="DR_Model.Store.Destinations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmailBatches">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Destinations">
+              <PropertyRef Name="EmailBatchId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_JourneyDestination">
+          <End Role="Journeys" Type="DR_Model.Store.Journeys" Multiplicity="1" />
+          <End Role="Destinations" Type="DR_Model.Store.Destinations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Journeys">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Destinations">
+              <PropertyRef Name="JourneyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LogTypeLog">
+          <End Role="LogTypes" Type="DR_Model.Store.LogTypes" Multiplicity="1" />
+          <End Role="Logs" Type="DR_Model.Store.Logs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LogTypes">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Logs">
+              <PropertyRef Name="LogTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StationDestination">
+          <End Role="Stations" Type="DR_Model.Store.Stations" Multiplicity="1" />
+          <End Role="Destinations" Type="DR_Model.Store.Destinations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stations">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Destinations">
+              <PropertyRef Name="StationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StationFromStation">
+          <End Role="Stations" Type="DR_Model.Store.Stations" Multiplicity="1" />
+          <End Role="FromStations" Type="DR_Model.Store.FromStations" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stations">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FromStations">
+              <PropertyRef Name="StationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StationUser">
+          <End Role="Stations" Type="DR_Model.Store.Stations" Multiplicity="1" />
+          <End Role="Users" Type="DR_Model.Store.Users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stations">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="HomeStationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserStation">
+          <End Role="Stations" Type="DR_Model.Store.Stations" Multiplicity="1" />
+          <End Role="Users" Type="DR_Model.Store.Users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stations">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="DestinationStationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DR_Model" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="DR_Entities" p1:LazyLoadingEnabled="true">
+          <EntitySet Name="Stations" EntityType="DR_Model.Station" />
+          <EntitySet Name="Users" EntityType="DR_Model.User" />
+          <AssociationSet Name="FK_StationUser" Association="DR_Model.FK_StationUser">
+            <End Role="Stations" EntitySet="Stations" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserStation" Association="DR_Model.FK_UserStation">
+            <End Role="Stations" EntitySet="Stations" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
+          <EntitySet Name="Logs" EntityType="DR_Model.Log" />
+          <EntitySet Name="LogTypes" EntityType="DR_Model.LogType" />
+          <AssociationSet Name="LogTypeLog" Association="DR_Model.LogTypeLog">
+            <End Role="LogType" EntitySet="LogTypes" />
+            <End Role="Log" EntitySet="Logs" />
+          </AssociationSet>
+          <EntitySet Name="Journeys" EntityType="DR_Model.Journey" />
+          <EntitySet Name="Destinations" EntityType="DR_Model.Destination" />
+          <AssociationSet Name="JourneyDestination" Association="DR_Model.JourneyDestination">
+            <End Role="Journey" EntitySet="Journeys" />
+            <End Role="Destination" EntitySet="Destinations" />
+          </AssociationSet>
+          <AssociationSet Name="StationDestination" Association="DR_Model.StationDestination">
+            <End Role="Station" EntitySet="Stations" />
+            <End Role="Destination" EntitySet="Destinations" />
+          </AssociationSet>
+          <EntitySet Name="FromStations" EntityType="DR_Model.FromStation" />
+          <AssociationSet Name="DestinationFromStation" Association="DR_Model.DestinationFromStation">
+            <End Role="Destination" EntitySet="Destinations" />
+            <End Role="FromStation" EntitySet="FromStations" />
+          </AssociationSet>
+          <AssociationSet Name="StationFromStation" Association="DR_Model.StationFromStation">
+            <End Role="Station" EntitySet="Stations" />
+            <End Role="FromStation" EntitySet="FromStations" />
+          </AssociationSet>
+          <EntitySet Name="EmailBatches" EntityType="DR_Model.EmailBatch" />
+          <AssociationSet Name="EmailBatchDestination" Association="DR_Model.EmailBatchDestination">
+            <End Role="EmailBatch" EntitySet="EmailBatches" />
+            <End Role="Destination" EntitySet="Destinations" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="Station">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="StationCode" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Name="StationName" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="HomeUsers" Relationship="DR_Model.FK_StationUser" FromRole="Stations" ToRole="Users" />
+          <NavigationProperty Name="DestinationUsers" Relationship="DR_Model.FK_UserStation" FromRole="Stations" ToRole="Users" />
+          <NavigationProperty Name="Destinations" Relationship="DR_Model.StationDestination" FromRole="Station" ToRole="Destination" />
+          <NavigationProperty Name="FromStations" Relationship="DR_Model.StationFromStation" FromRole="Station" ToRole="FromStation" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="FormsAuthUserID" Type="Int32" Nullable="false" />
+          <Property Name="HomeStationId" Type="Int32" Nullable="false" />
+          <Property Name="DestinationStationId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="HomeStation" Relationship="DR_Model.FK_StationUser" FromRole="Users" ToRole="Stations" />
+          <NavigationProperty Name="DestinationStation" Relationship="DR_Model.FK_UserStation" FromRole="Users" ToRole="Stations" />
+          <Property Type="String" Name="EMail" MaxLength="500" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK_StationUser">
+          <End Role="Stations" Type="DR_Model.Station" Multiplicity="1" />
+          <End Role="Users" Type="DR_Model.User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stations">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="HomeStationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserStation">
+          <End Role="Stations" Type="DR_Model.Station" Multiplicity="1" />
+          <End Role="Users" Type="DR_Model.User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stations">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="DestinationStationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Log">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="LogType" Relationship="DR_Model.LogTypeLog" FromRole="Log" ToRole="LogType" />
+          <Property Type="Int32" Name="LogTypeId" Nullable="false" />
+          <Property Type="DateTime" Name="Timestamp" Nullable="false" Precision="3" />
+          <Property Type="String" Name="Message" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Type="String" Name="Header" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="LogType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="LogTypeName" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Logs" Relationship="DR_Model.LogTypeLog" FromRole="LogType" ToRole="Log" />
+        </EntityType>
+        <Association Name="LogTypeLog">
+          <End Type="DR_Model.LogType" Role="LogType" Multiplicity="1" />
+          <End Type="DR_Model.Log" Role="Log" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LogType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Log">
+              <PropertyRef Name="LogTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Journey">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="JCode" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <Property Type="String" Name="TrainOperator" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
+          <NavigationProperty Name="Destinations" Relationship="DR_Model.JourneyDestination" FromRole="Journey" ToRole="Destination" />
+        </EntityType>
+        <EntityType Name="Destination">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Journey" Relationship="DR_Model.JourneyDestination" FromRole="Destination" ToRole="Journey" />
+          <Property Type="Int32" Name="JourneyId" Nullable="false" />
+          <NavigationProperty Name="Station" Relationship="DR_Model.StationDestination" FromRole="Destination" ToRole="Station" />
+          <Property Type="Int32" Name="StationId" Nullable="false" />
+          <NavigationProperty Name="FromStations" Relationship="DR_Model.DestinationFromStation" FromRole="Destination" ToRole="FromStation" />
+          <Property Type="DateTime" Name="ScheduledArrival" Nullable="false" Precision="3" />
+          <Property Type="DateTime" Name="ActualArrival" Nullable="false" Precision="3" />
+          <NavigationProperty Name="EmailBatch" Relationship="DR_Model.EmailBatchDestination" FromRole="Destination" ToRole="EmailBatch" />
+          <Property Type="Int32" Name="EmailBatchId" Nullable="true" />
+        </EntityType>
+        <Association Name="JourneyDestination">
+          <End Type="DR_Model.Journey" Role="Journey" Multiplicity="1" />
+          <End Type="DR_Model.Destination" Role="Destination" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Journey">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Destination">
+              <PropertyRef Name="JourneyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="StationDestination">
+          <End Type="DR_Model.Station" Role="Station" Multiplicity="1" />
+          <End Type="DR_Model.Destination" Role="Destination" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Station">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Destination">
+              <PropertyRef Name="StationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="FromStation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Destination" Relationship="DR_Model.DestinationFromStation" FromRole="FromStation" ToRole="Destination" />
+          <Property Type="Int32" Name="DestinationId" Nullable="false" />
+          <NavigationProperty Name="Station" Relationship="DR_Model.StationFromStation" FromRole="FromStation" ToRole="Station" />
+          <Property Type="Int32" Name="StationId" Nullable="false" />
+          <Property Type="DateTime" Name="ScheduledDeparture" Nullable="false" Precision="3" />
+        </EntityType>
+        <Association Name="DestinationFromStation">
+          <End Type="DR_Model.Destination" Role="Destination" Multiplicity="1" />
+          <End Type="DR_Model.FromStation" Role="FromStation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Destination">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FromStation">
+              <PropertyRef Name="DestinationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="StationFromStation">
+          <End Type="DR_Model.Station" Role="Station" Multiplicity="1" />
+          <End Type="DR_Model.FromStation" Role="FromStation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Station">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="FromStation">
+              <PropertyRef Name="StationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="EmailBatch">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="DateTime" Name="Created" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Destinations" Relationship="DR_Model.EmailBatchDestination" FromRole="EmailBatch" ToRole="Destination" />
+        </EntityType>
+        <Association Name="EmailBatchDestination">
+          <End Type="DR_Model.EmailBatch" Role="EmailBatch" Multiplicity="0..1" />
+          <End Type="DR_Model.Destination" Role="Destination" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmailBatch">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Destination">
+              <PropertyRef Name="EmailBatchId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="DR_ModelStoreContainer" CdmEntityContainer="DR_Entities">
+    <EntitySetMapping Name="Stations">
+      <EntityTypeMapping TypeName="IsTypeOf(DR_Model.Station)">
+        <MappingFragment StoreEntitySet="Stations">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="StationCode" ColumnName="StationCode" />
+          <ScalarProperty Name="StationName" ColumnName="StationName" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Users">
+      <EntityTypeMapping TypeName="IsTypeOf(DR_Model.User)">
+        <MappingFragment StoreEntitySet="Users">
+          <ScalarProperty Name="EMail" ColumnName="EMail" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="FormsAuthUserID" ColumnName="FormsAuthUserID" />
+          <ScalarProperty Name="HomeStationId" ColumnName="HomeStationId" />
+          <ScalarProperty Name="DestinationStationId" ColumnName="DestinationStationId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Logs">
+      <EntityTypeMapping TypeName="IsTypeOf(DR_Model.Log)">
+        <MappingFragment StoreEntitySet="Logs">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="LogTypeId" ColumnName="LogTypeId" />
+          <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+          <ScalarProperty Name="Message" ColumnName="Message" />
+          <ScalarProperty Name="Header" ColumnName="Header" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="LogTypes">
+      <EntityTypeMapping TypeName="IsTypeOf(DR_Model.LogType)">
+        <MappingFragment StoreEntitySet="LogTypes">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="LogTypeName" ColumnName="LogTypeName" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Journeys">
+      <EntityTypeMapping TypeName="IsTypeOf(DR_Model.Journey)">
+        <MappingFragment StoreEntitySet="Journeys">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="JCode" ColumnName="JCode" />
+          <ScalarProperty Name="TrainOperator" ColumnName="TrainOperator" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Destinations">
+      <EntityTypeMapping TypeName="IsTypeOf(DR_Model.Destination)">
+        <MappingFragment StoreEntitySet="Destinations">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="JourneyId" ColumnName="JourneyId" />
+          <ScalarProperty Name="StationId" ColumnName="StationId" />
+          <ScalarProperty Name="ScheduledArrival" ColumnName="ScheduledArrival" />
+          <ScalarProperty Name="ActualArrival" ColumnName="ActualArrival" />
+          <ScalarProperty Name="EmailBatchId" ColumnName="EmailBatchId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="FromStations">
+      <EntityTypeMapping TypeName="IsTypeOf(DR_Model.FromStation)">
+        <MappingFragment StoreEntitySet="FromStations">
+          <ScalarProperty Name="ScheduledDeparture" ColumnName="ScheduledDeparture" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="DestinationId" ColumnName="DestinationId" />
+          <ScalarProperty Name="StationId" ColumnName="StationId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="EmailBatches">
+      <EntityTypeMapping TypeName="IsTypeOf(DR_Model.EmailBatch)">
+        <MappingFragment StoreEntitySet="EmailBatches">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Created" ColumnName="Created" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

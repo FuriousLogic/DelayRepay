@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="9ef4d6bdcc184e1bb96a6e56441466af" Name="Diagram1" ZoomLevel="85">
+        <EntityTypeShape EntityType="DR_Model.Station" Width="1.875" PointX="3.25" PointY="0.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DR_Model.User" Width="2" PointX="0.5" PointY="0.5" IsExpanded="true" />
+        <AssociationConnector Association="DR_Model.FK_StationUser" ManuallyRouted="false" />
+        <AssociationConnector Association="DR_Model.FK_UserStation" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="DR_Model.Log" Width="1.5" PointX="10" PointY="0.5" />
+        <EntityTypeShape EntityType="DR_Model.LogType" Width="1.5" PointX="10" PointY="3.25" />
+        <AssociationConnector Association="DR_Model.LogTypeLog" />
+        <EntityTypeShape EntityType="DR_Model.Journey" Width="1.875" PointX="0.5" PointY="3.25" />
+        <EntityTypeShape EntityType="DR_Model.Destination" Width="1.5" PointX="3.125" PointY="3.75" />
+        <AssociationConnector Association="DR_Model.JourneyDestination" />
+        <AssociationConnector Association="DR_Model.StationDestination" />
+        <EntityTypeShape EntityType="DR_Model.FromStation" Width="1.75" PointX="6.25" PointY="1.875" />
+        <AssociationConnector Association="DR_Model.DestinationFromStation" />
+        <AssociationConnector Association="DR_Model.StationFromStation" />
+        <EntityTypeShape EntityType="DR_Model.EmailBatch" Width="1.5" PointX="6.25" PointY="4.75" />
+        <AssociationConnector Association="DR_Model.EmailBatchDestination" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
