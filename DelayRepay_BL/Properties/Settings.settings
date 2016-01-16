@@ -14,9 +14,6 @@
     <Setting Name="SmtpUsername" Type="System.String" Scope="Application">
       <Value Profile="(Default)">mrbarrydonaldson</Value>
     </Setting>
-    <Setting Name="SmtpPassword" Type="System.String" Scope="Application">
-      <Value Profile="(Default)"> fvqsskttxkigjgvn</Value>
-    </Setting>
     <Setting Name="URLMain" Type="System.String" Scope="Application">
       <Value Profile="(Default)">http://realtime.nationalrail.co.uk/cct/sumarr.aspx?T={0}</Value>
     </Setting>
@@ -25,6 +22,9 @@
     </Setting>
     <Setting Name="URLDetailFragment" Type="System.String" Scope="Application">
       <Value Profile="(Default)">http://realtime.nationalrail.co.uk/cct/</Value>
+    </Setting>
+    <Setting Name="SmtpPassword" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">jzpdgfabidqxpzin</Value>
     </Setting>
   </Settings>
 </SettingsFile>

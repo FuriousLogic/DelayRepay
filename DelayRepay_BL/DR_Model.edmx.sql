@@ -1,9 +1,9 @@
 
 -- --------------------------------------------------
--- Entity Designer DDL Script for SQL Server 2005, 2008, and Azure
+-- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 11/30/2012 17:34:56
--- Generated from EDMX file: C:\Users\Barry\documents\visual studio 2012\Projects\DelayRepay_Service\DelayRepay_BL\DR_Model.edmx
+-- Date Created: 01/15/2016 19:52:09
+-- Generated from EDMX file: C:\Development\dotNet\DelayRepay\DelayRepay_BL\DR_Model.edmx
 -- --------------------------------------------------
 
 SET QUOTED_IDENTIFIER OFF;
@@ -17,37 +17,46 @@ GO
 -- Dropping existing FOREIGN KEY constraints
 -- --------------------------------------------------
 
+IF OBJECT_ID(N'[dbo].[FK_DestinationFromStation]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[FromStations] DROP CONSTRAINT [FK_DestinationFromStation];
+GO
+IF OBJECT_ID(N'[dbo].[FK_EmailBatchDestination]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Destinations] DROP CONSTRAINT [FK_EmailBatchDestination];
+GO
+IF OBJECT_ID(N'[dbo].[FK_JourneyDestination]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Destinations] DROP CONSTRAINT [FK_JourneyDestination];
+GO
+IF OBJECT_ID(N'[dbo].[FK_LogTypeLog]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Logs] DROP CONSTRAINT [FK_LogTypeLog];
+GO
+IF OBJECT_ID(N'[dbo].[FK_StationDestination]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Destinations] DROP CONSTRAINT [FK_StationDestination];
+GO
+IF OBJECT_ID(N'[dbo].[FK_StationFromStation]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[FromStations] DROP CONSTRAINT [FK_StationFromStation];
+GO
 IF OBJECT_ID(N'[dbo].[FK_StationUser]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Users] DROP CONSTRAINT [FK_StationUser];
 GO
 IF OBJECT_ID(N'[dbo].[FK_UserStation]', 'F') IS NOT NULL
     ALTER TABLE [dbo].[Users] DROP CONSTRAINT [FK_UserStation];
 GO
-IF OBJECT_ID(N'[dbo].[FK_LogTypeLog]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Logs] DROP CONSTRAINT [FK_LogTypeLog];
-GO
-IF OBJECT_ID(N'[dbo].[FK_JourneyDestination]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Destinations] DROP CONSTRAINT [FK_JourneyDestination];
-GO
-IF OBJECT_ID(N'[dbo].[FK_StationDestination]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[Destinations] DROP CONSTRAINT [FK_StationDestination];
-GO
-IF OBJECT_ID(N'[dbo].[FK_DestinationFromStation]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[FromStations] DROP CONSTRAINT [FK_DestinationFromStation];
-GO
-IF OBJECT_ID(N'[dbo].[FK_StationFromStation]', 'F') IS NOT NULL
-    ALTER TABLE [dbo].[FromStations] DROP CONSTRAINT [FK_StationFromStation];
-GO
 
 -- --------------------------------------------------
 -- Dropping existing tables
 -- --------------------------------------------------
 
-IF OBJECT_ID(N'[dbo].[Stations]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Stations];
+IF OBJECT_ID(N'[dbo].[Destinations]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Destinations];
 GO
-IF OBJECT_ID(N'[dbo].[Users]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Users];
+IF OBJECT_ID(N'[dbo].[EmailBatches]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[EmailBatches];
+GO
+IF OBJECT_ID(N'[dbo].[FromStations]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[FromStations];
+GO
+IF OBJECT_ID(N'[dbo].[Journeys]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Journeys];
 GO
 IF OBJECT_ID(N'[dbo].[Logs]', 'U') IS NOT NULL
     DROP TABLE [dbo].[Logs];
@@ -55,17 +64,11 @@ GO
 IF OBJECT_ID(N'[dbo].[LogTypes]', 'U') IS NOT NULL
     DROP TABLE [dbo].[LogTypes];
 GO
-IF OBJECT_ID(N'[dbo].[Journeys]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Journeys];
+IF OBJECT_ID(N'[dbo].[Stations]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Stations];
 GO
-IF OBJECT_ID(N'[dbo].[Destinations]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[Destinations];
-GO
-IF OBJECT_ID(N'[dbo].[FromStations]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[FromStations];
-GO
-IF OBJECT_ID(N'[dbo].[EmailBatches]', 'U') IS NOT NULL
-    DROP TABLE [dbo].[EmailBatches];
+IF OBJECT_ID(N'[dbo].[Users]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Users];
 GO
 
 -- --------------------------------------------------
@@ -85,7 +88,8 @@ CREATE TABLE [dbo].[Users] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [FormsAuthUserID] int  NOT NULL,
     [HomeStationId] int  NOT NULL,
-    [DestinationStationId] int  NOT NULL
+    [DestinationStationId] int  NOT NULL,
+    [EMail] nvarchar(500)  NULL
 );
 GO
 
@@ -129,7 +133,8 @@ GO
 CREATE TABLE [dbo].[FromStations] (
     [Id] int IDENTITY(1,1) NOT NULL,
     [DestinationId] int  NOT NULL,
-    [StationId] int  NOT NULL
+    [StationId] int  NOT NULL,
+    [ScheduledDeparture] datetime  NOT NULL
 );
 GO
 
@@ -203,6 +208,7 @@ ADD CONSTRAINT [FK_StationUser]
     REFERENCES [dbo].[Stations]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_StationUser'
 CREATE INDEX [IX_FK_StationUser]
@@ -217,6 +223,7 @@ ADD CONSTRAINT [FK_UserStation]
     REFERENCES [dbo].[Stations]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_UserStation'
 CREATE INDEX [IX_FK_UserStation]
@@ -231,6 +238,7 @@ ADD CONSTRAINT [FK_LogTypeLog]
     REFERENCES [dbo].[LogTypes]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_LogTypeLog'
 CREATE INDEX [IX_FK_LogTypeLog]
@@ -245,6 +253,7 @@ ADD CONSTRAINT [FK_JourneyDestination]
     REFERENCES [dbo].[Journeys]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_JourneyDestination'
 CREATE INDEX [IX_FK_JourneyDestination]
@@ -259,6 +268,7 @@ ADD CONSTRAINT [FK_StationDestination]
     REFERENCES [dbo].[Stations]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_StationDestination'
 CREATE INDEX [IX_FK_StationDestination]
@@ -273,6 +283,7 @@ ADD CONSTRAINT [FK_DestinationFromStation]
     REFERENCES [dbo].[Destinations]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_DestinationFromStation'
 CREATE INDEX [IX_FK_DestinationFromStation]
@@ -287,6 +298,7 @@ ADD CONSTRAINT [FK_StationFromStation]
     REFERENCES [dbo].[Stations]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_StationFromStation'
 CREATE INDEX [IX_FK_StationFromStation]
@@ -301,6 +313,7 @@ ADD CONSTRAINT [FK_EmailBatchDestination]
     REFERENCES [dbo].[EmailBatches]
         ([Id])
     ON DELETE NO ACTION ON UPDATE NO ACTION;
+GO
 
 -- Creating non-clustered index for FOREIGN KEY 'FK_EmailBatchDestination'
 CREATE INDEX [IX_FK_EmailBatchDestination]
