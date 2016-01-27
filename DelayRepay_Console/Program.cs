@@ -23,14 +23,14 @@ namespace DelayRepay_Console
         private static void DoSomething(Object state)
         {
             if (isRunning)
+            {
                 Console.WriteLine("DoSomething still running from last time {0}", DateTime.Now.ToString("dd/MMM/yy HH:mm:ss"));
-            else
-                Console.WriteLine("DoSomething {0}", DateTime.Now.ToString("dd/MMM/yy HH:mm:ss"));
+                return;
+            }
 
             isRunning = true;
-            DRHelper helper = new DRHelper();
+            var helper = new DRHelper();
             helper.DoSomething();
-            helper = null;
             isRunning = false;
         }
     }

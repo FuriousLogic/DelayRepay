@@ -18,15 +18,23 @@ namespace DelayRepay_BL
 
     public class DRHelper
     {
-        readonly DR_Entities _db;
+        private readonly DR_Entities _db;
 
         public DRHelper()
         {
             _db = new DR_Entities();
         }
 
+        private enum MsgType
+        {
+            FunctionCall,
+            Error,
+            Info
+        }
+
         public void DoSomething(bool isConnected = true)
         {
+            ConsoleMsg("DoSomething",MsgType.FunctionCall);
             try
             {
                 //Do the emails need to be sent?
@@ -43,12 +51,13 @@ namespace DelayRepay_BL
                     };
                 }
                 if ((DateTime.Now - eBatch.Created).TotalDays >= 7)
-                    SendClaimEmails(eBatch.Created, isConnected);
+                    SendClaimEmails();
                 else
                     HarvestTrainJourneyInfo(isConnected);
             }
             catch (Exception ex)
             {
+                ConsoleMsg(ex.Message,MsgType.Error);
                 var db = new DR_Entities();
                 LogType ltError = (from lt in db.LogTypes where lt.LogTypeName == "Error" select lt).FirstOrDefault();
                 var log = new Log
@@ -64,8 +73,35 @@ namespace DelayRepay_BL
             }
         }
 
-        private void SendClaimEmails(DateTime lastCreated, bool isConnected)
+        private static void ConsoleMsg(string msg, MsgType mt)
         {
+            switch (mt)
+            {
+                case MsgType.FunctionCall:
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    break;
+                case MsgType.Info:
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    break;
+                case MsgType.Error:
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+                default:
+                    Console.BackgroundColor=ConsoleColor.White;
+                    Console.ForegroundColor=ConsoleColor.Black;
+                    msg = $"Unknown Message Type: {mt}. {msg}";
+                    break;
+            }
+
+            Console.WriteLine(msg);
+        }
+
+        private void SendClaimEmails()
+        {
+            ConsoleMsg("SendClaimEmails", MsgType.FunctionCall);
             //Create new Batch
             var newBatch = new EmailBatch
             {
@@ -172,8 +208,9 @@ namespace DelayRepay_BL
                     {
                         smtpClient.Send(mm);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        ConsoleMsg(ex.Message, MsgType.Error);
                     }
                     _db.SaveChanges();
                 }
@@ -183,6 +220,7 @@ namespace DelayRepay_BL
 
         public void TestEMail()
         {
+            ConsoleMsg("TestEMail", MsgType.FunctionCall);
             try
             {
                 var mm = new MailMessage
@@ -208,6 +246,7 @@ namespace DelayRepay_BL
             }
             catch (Exception ex)
             {
+                ConsoleMsg(ex.Message, MsgType.Error);
                 var db = new DR_Entities();
                 LogType ltError = (from lt in db.LogTypes where lt.LogTypeName == "Error" select lt).FirstOrDefault();
                 var log = new Log
@@ -225,6 +264,7 @@ namespace DelayRepay_BL
 
         private void HarvestTrainJourneyInfo(bool isConnected)
         {
+            ConsoleMsg("HarvestTrainJourneyInfo", MsgType.FunctionCall);
             IEnumerable<Station> stations = GetDistinctListOfStations();
             foreach (Station destinationStation in stations)
             {
@@ -249,9 +289,7 @@ namespace DelayRepay_BL
                     string startingStationName;
                     string platform = "";
                     string timetable;
-                    DateTime expected = DateTime.Now;
                     string trainOperator;
-                    string partialURLForStationList;
                     if (row.Children.Count < 5) continue;
 
                     if (GetContent(row.Children[0]).ToLower().Trim() == "from") continue;
@@ -270,17 +308,17 @@ namespace DelayRepay_BL
                         timetable = GetContent(row.Children[2]);
                         trainOperator = GetContent(row.Children[4]);
                     }
-                    partialURLForStationList = row.Children[0].Children[0].Attributes[0].Content.Replace("&amp", "&");
-                    if (partialURLForStationList.Substring(0, 1) == "\"")
+                    var partialUrlForStationList = row.Children[0].Children[0].Attributes[0].Content.Replace("&amp", "&");
+                    if (partialUrlForStationList.Substring(0, 1) == "\"")
                     {
-                        partialURLForStationList = partialURLForStationList.Substring(1);
-                        partialURLForStationList = partialURLForStationList.Substring(0, partialURLForStationList.Length - 1);
+                        partialUrlForStationList = partialUrlForStationList.Substring(1);
+                        partialUrlForStationList = partialUrlForStationList.Substring(0, partialUrlForStationList.Length - 1);
                     }
-                    string details = row.Children[0].Children[0].Attributes[0].Content.Replace("&amp", "&");
+                    var details = row.Children[0].Children[0].Attributes[0].Content.Replace("&amp", "&");
 
                     //Get J-Code (seems to be unique id for a train journey)
                     string jCode = "";
-                    string[] urlParams = partialURLForStationList.Split('&');
+                    string[] urlParams = partialUrlForStationList.Split('&');
                     foreach (string t in urlParams)
                     {
                         if (t.ToUpper().StartsWith("J="))
@@ -337,7 +375,7 @@ namespace DelayRepay_BL
                     }
 
                     //Look for fromStations in "Previous Calling Points"
-                    IEnumerable<FromStation> validStartingStations = ConfirmStartingStations(partialURLForStationList, fromStations, details, isConnected);
+                    IEnumerable<FromStation> validStartingStations = ConfirmStartingStations(partialUrlForStationList, fromStations, details, isConnected);
                     foreach (FromStation fs in validStartingStations)
                     {
                         FromStation fromStation = (from fr in destination.FromStations where fr.Station.Id == fs.StationId select fr).FirstOrDefault();
@@ -346,38 +384,38 @@ namespace DelayRepay_BL
                     }
 
                     //Is this worth saving?
-                    if (destination.FromStations.Count > 0)
-                    {
-                        if (destination.Journey == null)
-                            journey.Destinations.Add(destination);
-                        if (journey.Id == 0)
-                            _db.Journeys.Add(journey);
-                        _db.SaveChanges();
-                    }
+                    if (destination.FromStations.Count <= 0) continue;
+
+                    if (destination.Journey == null)
+                        journey.Destinations.Add(destination);
+                    if (journey.Id == 0)
+                        _db.Journeys.Add(journey);
+                    _db.SaveChanges();
                 }
             }
         }
 
-        private IEnumerable<FromStation> ConfirmStartingStations(string parialURLForStationList, List<Station> fromStations, string details, bool isConnected)
+        private IEnumerable<FromStation> ConfirmStartingStations(string parialUrlForStationList, List<Station> fromStations, string details, bool isConnected)
         {
+            ConsoleMsg("ConfirmStartingStations", MsgType.FunctionCall);
             var rv = new List<FromStation>();
-            string html = "";
+            var html = "";
 
             //Get HTML
             FileInfo fiStationList = null;
             if (isConnected)
             {
-                string url = Properties.Settings.Default.URLDetailFragment;
+                var url = Properties.Settings.Default.URLDetailFragment;
                 url += details.Replace("\"", "").Replace(";", "");
                 html = GetHtmlFromURL(url);
             }
             else
             {
-                string partFileName = parialURLForStationList.Replace("term.aspx?", "");
+                var partFileName = parialUrlForStationList.Replace("term.aspx?", "");
                 partFileName = partFileName.Replace("train.aspx?", "");
                 partFileName = partFileName.Replace(";", "");
 
-                foreach (FileInfo fi in GetLatestWebPagesFolder().GetFiles())
+                foreach (var fi in GetLatestWebPagesFolder().GetFiles())
                 {
                     if (!fi.Name.Contains(partFileName)) continue;
 
@@ -391,7 +429,7 @@ namespace DelayRepay_BL
                 }
                 if (fiStationList != null)
                 {
-                    StreamReader sr = fiStationList.OpenText();
+                    var sr = fiStationList.OpenText();
                     html = sr.ReadToEnd();
                     sr.Close();
                 }
@@ -399,46 +437,43 @@ namespace DelayRepay_BL
 
             //Get "Previous Calling Points" stations
             var tokeniser = new Tokeniser();
-            WebItem detailPage = tokeniser.Tokenise(html)[0];
-            WebItem detailRows = Tokeniser.ExtractSection(detailPage, "table", "title", "Previous Calling Points");
+            var detailPage = tokeniser.Tokenise(html)[0];
+            var detailRows = Tokeniser.ExtractSection(detailPage, "table", "title", "Previous Calling Points");
             if (detailRows == null) return rv;
 
             detailRows = Tokeniser.ExtractSection(detailRows, "tbody", "", "");
             if (detailRows == null) return rv;
 
-            foreach (WebItem detailRow in detailRows.Children)
+            foreach (var detailRow in detailRows.Children)
             {
                 if (detailRow.Text.ToLower() != "tr") continue;
                 if (detailRow.Children.Count < 2) continue;
 
-                WebItem wiStation = detailRow.Children[0];
+                var wiStation = detailRow.Children[0];
                 if (wiStation.Text.ToLower() == "th") continue;
 
-                WebItem wiSchedule = detailRow.Children[1];
+                var wiSchedule = detailRow.Children[1];
 
                 //Station Name
                 string stationName;
-                if (wiStation.Children.Count > 1)
-                    stationName = GetContent(wiStation.Children[0]);
-                else
-                    stationName = GetContent(wiStation);
+                stationName = GetContent(wiStation.Children.Count > 1 ? wiStation.Children[0] : wiStation);
                 if (stationName == "&nbsp;") continue;
 
                 //Scheduled Time
-                string strTime = wiSchedule.Children[0].Text;
+                var strTime = wiSchedule.Children[0].Text;
                 if (strTime.Trim().Length != 4)
                     throw new Exception("Couldn't get sceduled departure");
-                int hours = int.Parse(strTime.Substring(0, 2));
-                int minutes = int.Parse(strTime.Substring(2));
-                DateTime scheduledDep = DateTime.Today.AddHours(hours).AddMinutes(minutes);
+                var hours = int.Parse(strTime.Substring(0, 2));
+                var minutes = int.Parse(strTime.Substring(2));
+                var scheduledDep = DateTime.Today.AddHours(hours).AddMinutes(minutes);
                 if (DateTime.Now < scheduledDep) scheduledDep.AddDays(-1);
 
                 //Station Code
-                Station station = (from s in _db.Stations where s.StationName == stationName select s).FirstOrDefault();
+                var station = (from s in _db.Stations where s.StationName == stationName select s).FirstOrDefault();
                 if (station == null) continue;
 
                 //Is this one from the fromlist?
-                Station fromStation = (from fs in fromStations where fs.Id == station.Id select fs).FirstOrDefault();
+                var fromStation = (from fs in fromStations where fs.Id == station.Id select fs).FirstOrDefault();
                 if (fromStation != null)
                     rv.Add(new FromStation
                     {
@@ -458,12 +493,13 @@ namespace DelayRepay_BL
         /// <returns></returns>
         private static DateTime GetDatetime(int hour, int minute)
         {
-            DateTime dt = DateTime.Today;
+            ConsoleMsg("GetDatetime", MsgType.FunctionCall);
+            var dt = DateTime.Today;
             dt = dt.AddHours(hour);
             dt = dt.AddMinutes(minute);
 
             //If this is more that 12 hours before now then it must be for tomorrow
-            TimeSpan ts = DateTime.Now - dt;
+            var ts = DateTime.Now - dt;
             if (ts.TotalHours > 12)
                 dt = dt.AddDays(1);
 
@@ -477,7 +513,8 @@ namespace DelayRepay_BL
 
         private static DateTime GetDatetime(string timetable)
         {
-            int hour = int.Parse(timetable.Substring(0, 2));
+            ConsoleMsg("GetDatetime", MsgType.FunctionCall);
+            var hour = int.Parse(timetable.Substring(0, 2));
             int minute;
             switch (timetable.Trim().Length)
             {
@@ -493,19 +530,17 @@ namespace DelayRepay_BL
             return GetDatetime(hour, minute);
         }
 
-        public static string GetContent(WebItem wi)
+        private static string GetContent(WebItem wi)
         {
-            string rv = "";
-            foreach (WebItem child in wi.Children)
+            ConsoleMsg("GetContent", MsgType.FunctionCall);
+            var rv = "";
+            foreach (var child in wi.Children)
             {
                 if (child.Children.Count > 0)
-                {
-                    if (wi.Children.Count != 1) return "ERROR";
-                    return GetContent(child);
-                }
+                    return wi.Children.Count != 1 ? "ERROR" : GetContent(child);
             }
 
-            foreach (WebItem child in wi.Children)
+            foreach (var child in wi.Children)
             {
                 if (child.IsTag) continue;
                 if (rv.Length > 0) rv += " ";
@@ -517,22 +552,23 @@ namespace DelayRepay_BL
 
         private string getMainPageInfo(Station destinationStation, bool isConnected)
         {
-            string rv = "";
+            ConsoleMsg("getMainPageInfo", MsgType.FunctionCall);
+            var rv = "";
 
             if (isConnected)
             {
                 //http://ojp.nationalrail.co.uk/service/ldbboard/arr/NMP
-                string url = string.Format(Properties.Settings.Default.URLMain, destinationStation.StationCode);
+                var url = string.Format(Properties.Settings.Default.URLMain, destinationStation.StationCode);
                 rv = GetHtmlFromURL(url);
             }
             else
             {
                 //Get latest Folder
-                DirectoryInfo diWPBase = GetLatestWebPagesFolder();
+                var diWpBase = GetLatestWebPagesFolder();
 
                 //Get latest arrivals page
                 FileInfo lastWrittenArrivalFile = null;
-                foreach (FileInfo fi in diWPBase.GetFiles())
+                foreach (FileInfo fi in diWpBase.GetFiles())
                 {
                     if (!fi.Name.EndsWith("_T=" + destinationStation.StationCode + ".html")) continue;
 
@@ -559,6 +595,7 @@ namespace DelayRepay_BL
         
         private static string GetHtmlFromURL(string url)
         {
+            ConsoleMsg("GetHtmlFromURL", MsgType.FunctionCall);
             string rv = "";
 
             var site = new Uri(url);
@@ -593,6 +630,7 @@ namespace DelayRepay_BL
 
         private static DirectoryInfo GetLatestWebPagesFolder()
         {
+            ConsoleMsg("DirectoryInfo", MsgType.FunctionCall);
             int latestDate = 0;
             var diWPBase = new DirectoryInfo(Properties.Settings.Default.WebPagesFolder);
             foreach (DirectoryInfo di in diWPBase.GetDirectories())
@@ -607,6 +645,7 @@ namespace DelayRepay_BL
 
         private IEnumerable<Station> GetDistinctListOfStations()
         {
+            ConsoleMsg("GetDistinctListOfStations", MsgType.FunctionCall);
             //Get diffinative list of stations to monitor 
             List<Station> homeStations = (from u in _db.Users select u.HomeStation).ToList();
             List<Station> destinationStations = (from u in _db.Users select u.DestinationStation).ToList();
