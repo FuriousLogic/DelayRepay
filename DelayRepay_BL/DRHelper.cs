@@ -29,12 +29,13 @@ namespace DelayRepay_BL
         {
             FunctionCall,
             Error,
-            Info
+            Info,
+            NewCall
         }
 
         public void DoSomething(bool isConnected = true)
         {
-            ConsoleMsg("DoSomething",MsgType.FunctionCall);
+            ConsoleMsg("DoSomething",MsgType.NewCall);
             try
             {
                 //Do the emails need to be sent?
@@ -89,6 +90,10 @@ namespace DelayRepay_BL
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.ForegroundColor = ConsoleColor.Red;
                     break;
+                case MsgType.NewCall:
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    break;
                 default:
                     Console.BackgroundColor=ConsoleColor.White;
                     Console.ForegroundColor=ConsoleColor.Black;
@@ -96,6 +101,7 @@ namespace DelayRepay_BL
                     break;
             }
 
+            msg = $"{DateTime.Now.ToString("yyMMdd-HHmm")} {msg}";
             Console.WriteLine(msg);
         }
 
